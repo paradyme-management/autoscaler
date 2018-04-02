@@ -120,8 +120,13 @@ spec:
         app: cluster-autoscaler
     spec:
       serviceAccountName: cluster-autoscaler
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+      nodeSelector:
+        kubernetes.io/role: master
       containers:
-        - image: k8s.gcr.io/cluster-autoscaler:v0.6.0
+        - image: gcr.io/google_containers/cluster-autoscaler:v1.2.0
           name: cluster-autoscaler
           resources:
             limits:
@@ -136,10 +141,14 @@ spec:
             - --stderrthreshold=info
             - --cloud-provider=aws
             - --skip-nodes-with-local-storage=false
-            - --nodes=1:10:k8s-worker-asg-1
+            - --nodes=3:10:nodes.k8s-paradyme.k8s.local
           env:
             - name: AWS_REGION
-              value: us-east-1
+              value: us-east-2
+#            - name: AWS_ACCESS_KEY_ID
+#              value: AKIAII2QNRS2N42TCHMA
+#            - name: AWS_SECRET_ACCESS_KEY
+#              value: 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
           volumeMounts:
             - name: ssl-certs
               mountPath: /etc/ssl/certs/ca-certificates.crt
